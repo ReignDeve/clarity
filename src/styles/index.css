@@ -1,0 +1,391 @@
+@import "tailwindcss";
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/geist-mono";
+
+/* ------------------------------------------------------------------ tokens
+   CLARITY's palette: graphite and cool silver, one muted glacier-blue
+   accent, a faint violet for depth. Category hues are desaturated so the
+   charts read as information, not decoration. */
+
+:root {
+  color-scheme: dark;
+  --bg: #0b0d11;
+  --bg-tint: rgba(11, 13, 17, 0.86);
+  --fg: #e8eaef;
+  --fg-2: #a9afbc;
+  --fg-3: #737a89;
+  --fg-4: #4c5260;
+
+  --glass-0: rgba(20, 23, 30, 0.42);
+  --glass-1: rgba(24, 27, 35, 0.62);
+  --glass-2: rgba(32, 36, 46, 0.72);
+  --glass-solid: rgba(26, 29, 37, 0.94);
+  --hover: rgba(255, 255, 255, 0.045);
+  --active: rgba(255, 255, 255, 0.075);
+  --line: rgba(255, 255, 255, 0.07);
+  --line-2: rgba(255, 255, 255, 0.12);
+  --sheen: rgba(255, 255, 255, 0.06);
+  --shadow: 0 1px 0 0 var(--sheen) inset, 0 0 0 1px var(--line), 0 18px 40px -18px rgba(0, 0, 0, 0.7), 0 2px 6px -2px rgba(0, 0, 0, 0.4);
+  --shadow-float: 0 1px 0 0 var(--sheen) inset, 0 0 0 1px var(--line-2), 0 30px 80px -20px rgba(0, 0, 0, 0.8), 0 8px 24px -8px rgba(0, 0, 0, 0.5);
+
+  --accent: #93a6ff;
+  --accent-strong: #b3c0ff;
+  --accent-soft: rgba(147, 166, 255, 0.14);
+  --accent-line: rgba(147, 166, 255, 0.35);
+  --violet: #ab9cf2;
+  --on-accent: #0b0d11;
+
+  --ok: #7fc8a4;
+  --warn: #e0b46c;
+  --danger: #ef8a84;
+  --danger-soft: rgba(239, 138, 132, 0.12);
+  --warn-soft: rgba(224, 180, 108, 0.12);
+  --ok-soft: rgba(127, 200, 164, 0.12);
+
+  --c-documents: #7fa6e8;
+  --c-images: #6fc2b4;
+  --c-video: #a68cf0;
+  --c-audio: #d58fb3;
+  --c-archives: #d6b06e;
+  --c-installers: #e09a7a;
+  --c-code: #8cc98a;
+  --c-apps: #8d9ab3;
+  --c-system: #5f6676;
+  --c-other: #a3a8b3;
+  --c-folder: #93a6ff;
+
+  --aurora-a: rgba(110, 130, 255, 0.16);
+  --aurora-b: rgba(160, 130, 240, 0.11);
+  --aurora-c: rgba(120, 200, 220, 0.06);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #e9ecf1;
+  --bg-tint: rgba(236, 239, 244, 0.84);
+  --fg: #161a22;
+  --fg-2: #4a5160;
+  --fg-3: #737a88;
+  --fg-4: #a2a8b4;
+
+  --glass-0: rgba(255, 255, 255, 0.4);
+  --glass-1: rgba(255, 255, 255, 0.62);
+  --glass-2: rgba(255, 255, 255, 0.8);
+  --glass-solid: rgba(250, 251, 253, 0.96);
+  --hover: rgba(20, 30, 50, 0.04);
+  --active: rgba(20, 30, 50, 0.07);
+  --line: rgba(20, 28, 45, 0.08);
+  --line-2: rgba(20, 28, 45, 0.14);
+  --sheen: rgba(255, 255, 255, 0.85);
+  --shadow: 0 1px 0 0 var(--sheen) inset, 0 0 0 1px var(--line), 0 14px 34px -18px rgba(30, 40, 70, 0.28), 0 2px 5px -2px rgba(30, 40, 70, 0.08);
+  --shadow-float: 0 1px 0 0 var(--sheen) inset, 0 0 0 1px var(--line-2), 0 30px 70px -24px rgba(30, 40, 70, 0.35), 0 8px 20px -8px rgba(30, 40, 70, 0.15);
+
+  --accent: #4a62d8;
+  --accent-strong: #3549b8;
+  --accent-soft: rgba(74, 98, 216, 0.1);
+  --accent-line: rgba(74, 98, 216, 0.32);
+  --violet: #7b66d6;
+  --on-accent: #ffffff;
+
+  --ok: #2f8f63;
+  --warn: #a8731a;
+  --danger: #c4423b;
+  --danger-soft: rgba(196, 66, 59, 0.09);
+  --warn-soft: rgba(168, 115, 26, 0.1);
+  --ok-soft: rgba(47, 143, 99, 0.1);
+
+  --c-documents: #4f7fcf;
+  --c-images: #3a9c8c;
+  --c-video: #7d62d6;
+  --c-audio: #bd5e8d;
+  --c-archives: #b58a3c;
+  --c-installers: #c8704c;
+  --c-code: #55a052;
+  --c-apps: #64728e;
+  --c-system: #8a90a0;
+  --c-other: #9097a4;
+  --c-folder: #4a62d8;
+
+  --aurora-a: rgba(110, 130, 255, 0.18);
+  --aurora-b: rgba(170, 140, 240, 0.14);
+  --aurora-c: rgba(120, 200, 220, 0.12);
+}
+
+@theme {
+  --font-sans: "Geist Variable", "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "Geist Mono Variable", "Cascadia Mono", Consolas, monospace;
+  --color-fg: var(--fg);
+  --color-fg-2: var(--fg-2);
+  --color-fg-3: var(--fg-3);
+  --color-fg-4: var(--fg-4);
+  --color-line: var(--line);
+  --color-line-2: var(--line-2);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
+  --color-violet: var(--violet);
+  --color-ok: var(--ok);
+  --color-warn: var(--warn);
+  --color-danger: var(--danger);
+  --color-hover: var(--hover);
+  --color-active: var(--active);
+  --text-2xs: 10.5px;
+  --text-xs: 11.5px;
+  --text-sm: 12.5px;
+  --text-base: 13.5px;
+  --radius-panel: 12px;
+  --radius-ctl: 7px;
+}
+
+/* -------------------------------------------------------------------- base */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  line-height: 1.45;
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  cursor: default;
+}
+
+/* In the desktop app the window itself is translucent (Mica); the tint keeps
+   contrast predictable over any wallpaper. */
+html.native body {
+  background: transparent;
+}
+html.native .app-backdrop {
+  background: var(--bg-tint);
+}
+
+input,
+textarea,
+select,
+button {
+  font: inherit;
+  color: inherit;
+}
+
+.selectable,
+input,
+textarea {
+  user-select: text;
+  cursor: auto;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+::selection {
+  background: var(--accent-soft);
+}
+
+:focus-visible {
+  outline: 1.5px solid var(--accent);
+  outline-offset: 1px;
+  border-radius: 6px;
+}
+
+/* -------------------------------------------------------------- scrollbars */
+
+.scroll {
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-2) transparent;
+}
+.scroll::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.scroll::-webkit-scrollbar-thumb {
+  background: var(--line-2);
+  border-radius: 10px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+.scroll::-webkit-scrollbar-thumb:hover {
+  background-color: var(--fg-4);
+}
+
+/* ------------------------------------------------------------------- glass */
+
+.app-backdrop {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  overflow: hidden;
+  pointer-events: none;
+}
+.app-backdrop::before,
+.app-backdrop::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+}
+.app-backdrop::before {
+  width: 60vw;
+  height: 60vh;
+  left: -10vw;
+  top: -20vh;
+  background: radial-gradient(closest-side, var(--aurora-a), transparent);
+}
+.app-backdrop::after {
+  width: 55vw;
+  height: 55vh;
+  right: -12vw;
+  bottom: -18vh;
+  background: radial-gradient(closest-side, var(--aurora-b), transparent);
+}
+
+.glass {
+  background: var(--glass-1);
+  backdrop-filter: blur(28px) saturate(150%);
+  -webkit-backdrop-filter: blur(28px) saturate(150%);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius-panel);
+}
+.glass-thin {
+  background: var(--glass-0);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  box-shadow: 0 1px 0 0 var(--sheen) inset, 0 0 0 1px var(--line);
+  border-radius: var(--radius-panel);
+}
+.glass-float {
+  background: var(--glass-2);
+  backdrop-filter: blur(36px) saturate(160%);
+  -webkit-backdrop-filter: blur(36px) saturate(160%);
+  box-shadow: var(--shadow-float);
+  border-radius: 14px;
+}
+.glass-solid {
+  background: var(--glass-solid);
+  backdrop-filter: blur(36px) saturate(160%);
+  box-shadow: var(--shadow-float);
+  border-radius: 14px;
+}
+
+/* A thin light edge on top of panels, like light catching a glass sheet. */
+.edge-light {
+  position: relative;
+}
+.edge-light::before {
+  content: "";
+  position: absolute;
+  inset: 0 12% auto;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--sheen), rgba(170, 185, 255, 0.25), var(--sheen), transparent);
+  pointer-events: none;
+}
+
+.hairline {
+  border-color: var(--line);
+}
+
+/* ------------------------------------------------------------------- chips */
+
+.kbd {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  border: 1px solid var(--line-2);
+  color: var(--fg-3);
+  background: var(--hover);
+}
+
+.shimmer {
+  background: linear-gradient(90deg, transparent 0%, var(--accent-soft) 40%, var(--accent-line) 50%, var(--accent-soft) 60%, transparent 100%);
+  background-size: 50% 100%;
+  background-repeat: no-repeat;
+  animation: shimmer 1.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+@keyframes shimmer {
+  from {
+    background-position: -50% 0;
+  }
+  to {
+    background-position: 150% 0;
+  }
+}
+
+.spin {
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shimmer,
+  .spin {
+    animation-duration: 3s;
+  }
+}
+:root[data-motion="reduced"] .shimmer,
+:root[data-motion="reduced"] .spin {
+  animation-duration: 3s;
+}
+
+/* -------------------------------------------------------- syntax highlight */
+
+.hljs {
+  color: var(--fg-2);
+}
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-built_in,
+.hljs-literal {
+  color: var(--violet);
+}
+.hljs-string,
+.hljs-attr,
+.hljs-template-tag {
+  color: var(--ok);
+}
+.hljs-number,
+.hljs-symbol {
+  color: var(--warn);
+}
+.hljs-comment,
+.hljs-quote {
+  color: var(--fg-4);
+  font-style: italic;
+}
+.hljs-title,
+.hljs-section,
+.hljs-name,
+.hljs-function .hljs-title {
+  color: var(--accent);
+}
+.hljs-type,
+.hljs-class .hljs-title,
+.hljs-property {
+  color: var(--c-documents);
+}
+.hljs-meta,
+.hljs-variable {
+  color: var(--c-archives);
+}
+
+.drag {
+  -webkit-app-region: drag;
+}
