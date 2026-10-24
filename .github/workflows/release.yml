@@ -64,5 +64,5 @@ jobs:
           $N release create "$V" --if-not-exists --source ci --channel stable
           # Installers only: Nexus signs them for the Tauri updater.
           $N upload "$V" src-tauri/target/release/bundle/nsis/*-setup.exe src-tauri/target/release/bundle/msi/*.msi
-          $N changelog generate "$V" --apply
+          $N changelog generate "$V" --apply --if-empty
           $N release publish "$V"
