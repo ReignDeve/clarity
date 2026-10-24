@@ -1,6 +1,6 @@
 [package]
 name = "clarity"
-version = "0.2.0"
+version = "0.2.1"
 description = "Understand your storage. Decide what stays. Reclaim your space."
 authors = ["enquso"]
 edition = "2021"
