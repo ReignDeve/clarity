@@ -32,6 +32,8 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_notification::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_process::init())
         .register_asynchronous_uri_scheme_protocol("thumb", features::thumb_protocol)
         .setup(|app| {
             // CLARITY_DATA_DIR isolates test runs from the user's real history.

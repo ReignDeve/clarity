@@ -9,6 +9,8 @@ import type { History as H, OrganizeRun, ScanIssue, Settings as S } from "../lib
 import { useApp } from "../store/app";
 import { ViewHeader } from "./Lists";
 import { ResultModal } from "./Organizer";
+import { checkForUpdates, download, installAndRestart } from "../lib/updates";
+import { isNative } from "../lib/api";
 
 export function History() {
   const version = useApp((s) => s.version);
@@ -186,6 +188,8 @@ export function Settings() {
           )}
         </Panel>
 
+        <UpdatesPanel save={save} />
+
         <Panel title="Timestamps on this PC">
           <p className="text-sm text-fg-2">{info?.lastAccess.explanation}</p>
           <p className="mt-2 text-xs text-fg-3">CLARITY therefore bases its suggestions on modification dates only, and never claims a file has not been opened for a certain time.</p>
@@ -259,6 +263,50 @@ function OrganizeRuns() {
         ))}
       </div>
       <ResultModal run={open} onClose={() => setOpen(null)} />
+    </Panel>
+  );
+}
+
+function UpdatesPanel({ save }: { save: (p: Partial<S>) => Promise<void> }) {
+  const u = useApp((s) => s.update);
+  const settings = useApp((s) => s.settings);
+  const info = useApp((s) => s.info);
+  if (!settings) return null;
+  const status =
+    u.status === "checking" ? "Checking…"
+    : u.status === "none" ? "CLARITY is up to date."
+    : u.status === "available" ? `Version ${u.version} is available.`
+    : u.status === "downloading" ? `Downloading ${u.version}${u.progress != null ? ` (${Math.round(u.progress * 100)}%)` : ""}…`
+    : u.status === "ready" ? `Version ${u.version} is downloaded and ready.`
+    : u.status === "installing" ? "Installing…"
+    : u.status === "error" ? `Last check failed: ${u.error}`
+    : "Not checked yet.";
+  return (
+    <Panel title="Updates">
+      <Row label={`CLARITY ${info?.version ?? ""}`} hint={`${status}${u.checkedAt ? ` Last check ${dateTime(u.checkedAt)}.` : ""}`}>
+        <div className="flex gap-2">
+          {u.status === "available" && (
+            <Button size="sm" onClick={() => void download()}>
+              Download
+            </Button>
+          )}
+          {u.status === "ready" && (
+            <Button size="sm" tone="primary" onClick={() => void installAndRestart()}>
+              Restart to update
+            </Button>
+          )}
+          <Button size="sm" disabled={!isNative || ["checking", "downloading", "installing"].includes(u.status)} onClick={() => void checkForUpdates(true)}>
+            Check now
+          </Button>
+        </div>
+      </Row>
+      <Row label="Install updates automatically" hint="Downloads new versions in the background. CLARITY only restarts when you click “Restart to update”.">
+        <Toggle checked={settings.autoUpdate} onChange={(autoUpdate) => save({ autoUpdate })} label="Install updates automatically" />
+      </Row>
+      {u.notes && (u.status === "available" || u.status === "ready" || u.status === "downloading") && (
+        <div className="mt-1 whitespace-pre-line rounded-[8px] bg-[var(--glass-0)] p-3 text-xs text-fg-2 shadow-[0_0_0_1px_var(--line)]">{u.notes}</div>
+      )}
+      <p className="mt-2 text-2xs text-fg-4">Updates come from CLARITY's release server (Nexus) and are verified with a signature before installing. Only the version and an anonymous device id are sent.</p>
     </Panel>
   );
 }

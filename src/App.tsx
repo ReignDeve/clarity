@@ -18,6 +18,7 @@ import { Downloads, LargeFiles, OldFiles } from "./views/Lists";
 import { Overview } from "./views/Overview";
 import { Media } from "./views/Media";
 import { Organizer } from "./views/Organizer";
+import { startUpdateChecks } from "./lib/updates";
 import { MoveDialog, WatchDialog } from "./components/FeatureDialogs";
 import { Suggestions } from "./views/Suggestions";
 
@@ -86,6 +87,7 @@ async function boot() {
     if (cached) st.set({ scan: cached });
   }
   st.set({ ready: true });
+  startUpdateChecks();
 }
 
 export default function App() {

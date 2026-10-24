@@ -18,6 +18,10 @@ pub struct Settings {
     pub onboarded: bool,
     pub last_roots: Vec<String>,
     pub show_hidden: bool,
+    /// Download updates in the background and offer "Restart to update".
+    pub auto_update: bool,
+    /// Anonymous, persistent id sent with update checks (staged rollouts).
+    pub device_id: String,
     /// Settings schema revision, for one-off migrations of old defaults.
     #[serde(default)]
     pub rev: u32,
@@ -38,6 +42,8 @@ impl Default for Settings {
             onboarded: false,
             last_roots: vec![],
             show_hidden: true,
+            auto_update: true,
+            device_id: String::new(),
             rev: SETTINGS_REV,
         }
     }

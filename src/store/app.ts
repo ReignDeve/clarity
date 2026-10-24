@@ -41,6 +41,15 @@ export interface NavIntent {
   tab?: AnalysisTab;
 }
 
+export interface UpdateState {
+  status: "idle" | "checking" | "none" | "available" | "downloading" | "ready" | "installing" | "error";
+  version?: string;
+  notes?: string;
+  progress?: number;
+  error?: string;
+  checkedAt?: number;
+}
+
 export type AnalysisTab = "map" | "timeline" | "activity" | "watchlist";
 
 /** "Move together" request: a file plus its related files. */
@@ -88,6 +97,7 @@ interface AppState {
   mediaIndex: { done: number; total: number; running: boolean } | null;
   /** Folder open in the organizer, and the view to return to. */
   organize: { root: string | null; back: View } | null;
+  update: UpdateState;
 
   set: (p: Partial<AppState>) => void;
   go: (view: View, intent?: NavIntent) => void;
@@ -133,6 +143,7 @@ export const useApp = create<AppState>((set, get) => ({
   watchEdit: null,
   mediaIndex: null,
   organize: null,
+  update: { status: "idle" },
 
   set: (p) => set(p),
   go: (view, intent) => {

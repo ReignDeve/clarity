@@ -1,0 +1,68 @@
+# Builds CLARITY for Windows when a version tag is pushed and publishes it
+# through Nexus ReleaseHub, from where installed copies update themselves.
+# Needs the repository secret NEXUS_TOKEN (project-scoped, read/write/publish).
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 60
+    env:
+      NEXUS_URL: https://nexus.cloud.jonasbl.de
+      NEXUS_TOKEN: ${{ secrets.NEXUS_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Version must match the tag
+        shell: bash
+        run: |
+          V="${GITHUB_REF_NAME#v}"
+          for f in package.json src-tauri/tauri.conf.json; do
+            test "$(node -p "require('./$f').version")" = "$V" || { echo "::error::$f is not $V"; exit 1; }
+          done
+          grep -q "^version = \"$V\"" src-tauri/Cargo.toml || { echo "::error::Cargo.toml is not $V"; exit 1; }
+          test -n "$NEXUS_TOKEN" || { echo "::error::Repository secret NEXUS_TOKEN is missing"; exit 1; }
+
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - run: pnpm install --frozen-lockfile
+      - name: Tests
+        run: |
+          pnpm typecheck
+          pnpm test
+          cargo test --manifest-path src-tauri/Cargo.toml
+      - name: Build installers
+        run: pnpm tauri build
+
+      - name: Upload to Nexus and publish
+        shell: bash
+        run: |
+          V="${GITHUB_REF_NAME#v}"
+          curl -fsSL "$NEXUS_URL/cli/nexus.mjs" -o "$RUNNER_TEMP/nexus.mjs"
+          N="node $RUNNER_TEMP/nexus.mjs"
+          $N release create "$V" --if-not-exists --source ci --channel stable
+          # Installers only: Nexus signs them for the Tauri updater.
+          $N upload "$V" src-tauri/target/release/bundle/nsis/*-setup.exe src-tauri/target/release/bundle/msi/*.msi
+          $N changelog generate "$V" --apply
+          $N release publish "$V"

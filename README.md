@@ -70,6 +70,27 @@ Outputs:
 The app runs without administrator rights. Folders Windows does not let a
 normal user read are reported as unreadable instead of failing the scan.
 
+## Releases & auto-updates
+
+CLARITY updates itself from **Nexus ReleaseHub** (`aevar/clarity`, channel `stable`); details in [NEXUS.md](NEXUS.md).
+
+```
+pnpm release patch      # or minor / major / 1.2.3
+```
+
+The command:
+
+1. bumps `package.json`, `tauri.conf.json`, `Cargo.toml` and `Cargo.lock`
+2. commits and tags `vX.Y.Z`
+3. pushes the commit and the tag
+
+The tag starts `.github/workflows/release.yml` on a Windows runner. It runs the tests, builds the NSIS and MSI
+installers, uploads them to Nexus (which signs them for the Tauri updater) and publishes the release. Installed
+copies check about 5 s after start and every 6 h, download in the background, and show **Restart to update**
+in the title bar. Settings → Updates has *Check now* and the auto-download toggle.
+
+The workflow needs the repository secret `NEXUS_TOKEN`: a project-scoped Nexus token with `read, write, publish`.
+
 ## Architecture
 
 ```

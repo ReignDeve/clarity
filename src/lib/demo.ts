@@ -141,7 +141,7 @@ function build() {
 
 export function createDemoBackend(): Backend {
   let { dirs, files, downloads } = build();
-  let settings: Settings = { theme: "system", motion: "system", oldDays: 365, largeMb: 500, dupMinKb: 10240, skipSystem: true, exclusions: [], onboarded: false, lastRoots: [], showHidden: true };
+  let settings: Settings = { theme: "system", motion: "system", oldDays: 365, largeMb: 500, dupMinKb: 10240, skipSystem: true, exclusions: [], onboarded: false, lastRoots: [], showHidden: true, autoUpdate: true, deviceId: "demo" };
   let hasScan = false;
   let dupsComputed = false;
   const scans: ScanRecord[] = [];

@@ -53,6 +53,8 @@ export interface Settings {
   onboarded: boolean;
   lastRoots: string[];
   showHidden: boolean;
+  autoUpdate: boolean;
+  deviceId: string;
   rev?: number;
 }
 
