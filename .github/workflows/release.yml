@@ -48,10 +48,16 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
       - name: Tests
+        shell: bash
         run: |
+          set -o pipefail
           pnpm typecheck
           pnpm test
-          cargo test --manifest-path src-tauri/Cargo.toml
+          # Failing tests become annotations, readable without signing in to GitHub.
+          cargo test --manifest-path src-tauri/Cargo.toml --no-fail-fast 2>&1 | tee "$RUNNER_TEMP/cargo-test.log" || {
+            grep -E "^test .* FAILED|panicked at|^error(\[|:)|assertion" "$RUNNER_TEMP/cargo-test.log" | head -30 | sed 's/^/::error::/'
+            exit 1
+          }
       - name: Build installers
         run: pnpm tauri build
 
