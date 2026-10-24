@@ -128,8 +128,20 @@ pub fn check_item(index: &ScanIndex, item: ItemRef, protector: &Protector, mode:
             return blocked(item, path_s, name, size, "The file changed since the scan. Please rescan before removing it.");
         }
     }
+    // Compare against the *resolved* scan root plus the scanned subpath, so
+    // roots reached via 8.3 short names (C:\Users\RUNNER~1\...) or different
+    // casing still match, while links swapped in below the root are caught.
+    let anchor = match item.kind {
+        ItemKind::File => index.files[item.id as usize].dir,
+        ItemKind::Dir => item.id,
+    };
+    let root_path = index.dir_path(index.root_of(anchor));
+    let expected = match (fs::canonicalize(&root_path), path.strip_prefix(&root_path)) {
+        (Ok(root_real), Ok(rel)) => normalize(&root_real.join(rel)),
+        _ => normalize(&path),
+    };
     match fs::canonicalize(&path) {
-        Ok(c) if normalize(&c) == normalize(&path) => {}
+        Ok(c) if normalize(&c) == expected => {}
         Ok(_) => return blocked(item, path_s, name, size, "A parent folder is now a link to another location. Please rescan."),
         Err(e) => return blocked(item, path_s, name, size, format!("Cannot resolve location: {e}")),
     }
@@ -310,6 +322,31 @@ mod tests {
         assert_eq!(out.status, "deleted", "{:?}", out.error);
         assert_eq!(idx.total_bytes(), 7);
         assert!(t.path().join("stay.bin").exists());
+    }
+
+    /// Roots reached through an 8.3 short name (as on GitHub runners) must
+    /// not be mistaken for links.
+    #[cfg(windows)]
+    #[test]
+    fn short_name_roots_are_not_links() {
+        let t = tempfile::tempdir().unwrap();
+        let long = t.path().join("Long Folder Name");
+        fs::create_dir(&long).unwrap();
+        fs::write(long.join("x.txt"), b"x").unwrap();
+        let out = std::process::Command::new("cmd")
+            .args(["/C", r#"for %I in ("Long Folder Name") do @echo %~sI"#])
+            .current_dir(t.path())
+            .output()
+            .unwrap();
+        let short = String::from_utf8_lossy(&out.stdout).trim().to_string();
+        let short_root = Path::new(&short);
+        if short.is_empty() || !short_root.exists() || short_root.ends_with("Long Folder Name") {
+            return; // 8.3 names are disabled on this volume
+        }
+        let mut idx = index_of(short_root);
+        let id = file_id(&idx, "x.txt");
+        let out = execute_one(&mut idx, ItemRef { kind: ItemKind::File, id }, &open(), Mode::Permanent);
+        assert_eq!(out.status, "deleted", "{:?}", out.error);
     }
 
     #[cfg(windows)]
